@@ -1,10 +1,6 @@
 """
-Vectorization Benchmark: When does NumPy become faster?
-=========================================================
-
-Shows the crossover point where NumPy overhead is paid back by vectorization.
-Key insight: NumPy has a fixed overhead per operation (~1µs function call)
-but processes arrays in C. For small arrays, this overhead dominates.
+When does NumPy actually become faster than a Python loop?
+Shows the crossover point, memory layout effects, and operation comparisons.
 """
 
 import time
@@ -17,10 +13,7 @@ def benchmark_sizes():
     sizes = [10, 100, 1_000, 10_000, 100_000, 1_000_000]
     n_repeats = 1000
 
-    print("=" * 70)
-    print("VECTORIZATION: NumPy vs Python Loops at Different Sizes")
-    print("=" * 70)
-    print()
+    print("NumPy vs Python loop at different array sizes:\n")
     print(f"  {'Size':>10} {'Loop (µs)':>12} {'NumPy (µs)':>12} {'Speedup':>10} {'Winner':>8}")
     print(f"  {'-'*10} {'-'*12} {'-'*12} {'-'*10} {'-'*8}")
 
@@ -67,10 +60,7 @@ def benchmark_operations():
         ("Dot product", lambda d: sum(a * b for a, b in zip(d, data2)), lambda d: np.dot(d, data2)),
     ]
 
-    print("=" * 70)
-    print(f"OPERATION COMPARISON (n={n:,})")
-    print("=" * 70)
-    print()
+    print(f"\nOperation comparison (n={n:,}):\n")
     print(f"  {'Operation':<22} {'Loop':>10} {'NumPy':>10} {'Speedup':>10}")
     print(f"  {'-'*22} {'-'*10} {'-'*10} {'-'*10}")
 
@@ -98,10 +88,7 @@ def benchmark_memory_layout():
     # C-contiguous (row-major) — default for NumPy
     A = np.random.randn(n, n)  # C order (row-major)
 
-    print("=" * 70)
-    print("MEMORY LAYOUT: Cache-Friendly Access Patterns")
-    print("=" * 70)
-    print()
+    print(f"\nMemory layout ({n}x{n} array, {A.nbytes / 1024 / 1024:.0f} MB):\n")
 
     # Row-wise sum (sequential memory access — cache friendly)
     start = time.perf_counter()
@@ -123,11 +110,7 @@ def benchmark_memory_layout():
     print(f"  Row sum (C-order, sequential):     {row_time * 1000:.2f} ms")
     print(f"  Col sum (C-order, strided):        {col_time * 1000:.2f} ms")
     print(f"  Col sum (F-order, sequential):     {col_f_time * 1000:.2f} ms")
-    print()
-    print("  → Sequential memory access is faster (CPU cache prefetch)")
-    print("  → Choose memory layout based on your access pattern")
-    print("  → For row-wise operations: C order (default)")
-    print("  → For column-wise operations: Fortran order")
+    print(f"  (sequential access wins — CPU prefetch)")
     print()
 
 

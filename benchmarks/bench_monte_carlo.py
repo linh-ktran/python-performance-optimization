@@ -1,16 +1,7 @@
 """
-Comprehensive Benchmark: Monte Carlo Option Pricing
-=====================================================
+Monte Carlo benchmark — same problem, all optimization strategies side by side.
 
-Compare ALL optimization strategies on the same problem:
-1. Pure Python loops
-2. NumPy vectorized
-3. Numba JIT
-4. Numba parallel
-5. Multiprocessing
-6. C extension (ctypes)
-
-This shows the full spectrum of "How do you speed up Python?"
+Python loop vs NumPy vs Numba vs Numba parallel vs multiprocessing.
 """
 
 import math
@@ -28,9 +19,6 @@ except ImportError:
     HAS_NUMBA = False
 
 
-# =============================================================================
-# 1. Pure Python
-# =============================================================================
 
 def mc_python(S0, K, r, sigma, T, n_paths):
     """Pure Python — baseline."""
@@ -42,9 +30,6 @@ def mc_python(S0, K, r, sigma, T, n_paths):
     return math.exp(-r * T) * payoff_sum / n_paths
 
 
-# =============================================================================
-# 2. NumPy Vectorized
-# =============================================================================
 
 def mc_numpy(S0, K, r, sigma, T, n_paths):
     """NumPy vectorized — process all paths at once."""
@@ -54,9 +39,6 @@ def mc_numpy(S0, K, r, sigma, T, n_paths):
     return np.exp(-r * T) * np.mean(payoffs)
 
 
-# =============================================================================
-# 3 & 4. Numba JIT (single-threaded and parallel)
-# =============================================================================
 
 if HAS_NUMBA:
     @njit(cache=True)
@@ -81,9 +63,6 @@ if HAS_NUMBA:
         return math.exp(-r * T) * np.mean(payoffs)
 
 
-# =============================================================================
-# 5. Multiprocessing
-# =============================================================================
 
 def _mc_worker(args):
     """Worker for multiprocessing."""
@@ -106,21 +85,15 @@ def mc_multiprocessing(S0, K, r, sigma, T, n_paths):
     return np.mean(results)
 
 
-# =============================================================================
 # Benchmark runner
-# =============================================================================
 
 def run_benchmark():
     """Run all methods and compare."""
     S0, K, r, sigma, T = 100.0, 105.0, 0.05, 0.2, 1.0
     n_paths = 1_000_000
 
-    print("=" * 70)
-    print(f"MONTE CARLO OPTION PRICING BENCHMARK ({n_paths:,} paths)")
-    print("=" * 70)
-    print(f"  S0={S0}, K={K}, r={r}, σ={sigma}, T={T}")
-    print(f"  CPU cores: {cpu_count()}")
-    print()
+    print(f"Monte Carlo benchmark ({n_paths:,} paths, {cpu_count()} cores)")
+    print(f"  S0={S0}, K={K}, r={r}, sigma={sigma}, T={T}\n")
 
     results = []
 
@@ -168,13 +141,6 @@ def run_benchmark():
         speedup = baseline / elapsed
         print(f"  {name:<22} {elapsed:>8.4f}s {speedup:>9.1f}x  ${price:>8.4f}  {note}")
 
-    print()
-    print("  Key insights:")
-    print("  • NumPy: ~100x faster than Python (vectorization)")
-    print("  • Numba: ~100-200x faster (compiled to machine code)")
-    print("  • Numba parallel: ~N×cores faster (multi-core)")
-    print("  • Multiprocessing: good but has IPC overhead")
-    print("  • All give similar prices (statistical convergence)")
 
 
 if __name__ == "__main__":
