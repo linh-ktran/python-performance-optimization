@@ -1,8 +1,7 @@
 # Python Performance Optimization
 
-> Demonstrating how to speed up Python for computationally intensive, high-performance,
-> and low-level optimization workloads — with examples from numerical computing,
-> simulation, and real-time data processing.
+> How to speed up Python for computationally intensive, high-performance,
+> and low-level optimization workloads.
 
 
 ## Quick Decision Rule
@@ -44,10 +43,6 @@ pip install -r requirements.txt
 python -m benchmarks.bench_concurrency
 python -m benchmarks.bench_vectorization
 python -m benchmarks.bench_monte_carlo
-
-# Run specific examples
-python -m examples.concurrency.01_gil_demo
-python -m examples.vectorization.01_numpy_vs_loops
 
 # Run tests
 pytest tests/
